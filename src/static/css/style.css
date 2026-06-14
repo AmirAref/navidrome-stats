@@ -1,9 +1,53 @@
+/* ── Light / Dark mode ─────────────────────────────────────── */
+:root {
+  --bs-body-bg: #f8f9fa;
+  --bs-body-color: #212529;
+  --card-border: #dee2e6;
+  --card-bg: #fff;
+  --table-stripe-bg: rgba(0,0,0,.035);
+  --chart-grid: rgba(0,0,0,.1);
+  --chart-tick: #666;
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #121212;
+  --bs-body-color: #e0e0e0;
+  --card-border: #333;
+  --card-bg: #1e1e1e;
+  --table-stripe-bg: rgba(255,255,255,.05);
+  --chart-grid: rgba(255,255,255,.12);
+  --chart-tick: #aaa;
+}
+
 body {
-  background-color: #f8f9fa;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+/* Dark mode toggle button in navbar */
+#darkModeToggle {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.25);
+  background: transparent;
+  color: rgba(255,255,255,.85);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+}
+#darkModeToggle:hover {
+  background: rgba(255,255,255,.15);
 }
 
 .user-card {
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--card-border);
+  background-color: var(--card-bg);
   transition: transform .15s, box-shadow .15s;
   color: inherit;
 }

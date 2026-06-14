@@ -4,10 +4,22 @@ export const COLORS = [
   '#9c755f', '#bab0ac',
 ];
 
+function isDark() {
+  return document.documentElement.getAttribute('data-bs-theme') === 'dark';
+}
+
+function gridColor() {
+  return isDark() ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.1)';
+}
+
+function tickColor() {
+  return isDark() ? '#aaa' : '#666';
+}
+
 export function renderHBar(canvasId, labels, datasets) {
   const ctx = document.getElementById(canvasId);
   if (!ctx) return;
-  new Chart(ctx, {
+  const chart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
@@ -23,9 +35,30 @@ export function renderHBar(canvasId, labels, datasets) {
       responsive: true,
       plugins: { legend: { display: datasets.length > 1 } },
       scales: {
-        x: { beginAtZero: true, title: { display: true, text: 'Plays' } },
-        y: { ticks: { font: { size: 12 } } },
+        x: {
+          beginAtZero: true,
+          title: { display: true, text: 'Plays', color: tickColor() },
+          ticks: { color: tickColor() },
+          grid: { color: gridColor() },
+        },
+        y: {
+          ticks: { font: { size: 12 }, color: tickColor() },
+          grid: { color: gridColor() },
+        },
       },
     },
   });
+
+  // Re-color chart when dark mode is toggled
+  const observer = new MutationObserver(() => {
+    chart.options.scales.x.title.color = tickColor();
+    chart.options.scales.x.ticks.color = tickColor();
+    chart.options.scales.x.grid.color = gridColor();
+    chart.options.scales.y.ticks.color = tickColor();
+    chart.options.scales.y.grid.color = gridColor();
+    chart.update();
+  });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
+
+  return chart;
 }

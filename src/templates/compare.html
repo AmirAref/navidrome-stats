@@ -16,6 +16,12 @@ Stats{% endblock %} {% block content %}
 <script type="module">
     import { COLORS } from "{{ url_for('static',path='js/charts.js') }}";
 
+    function isDark() {
+        return document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    }
+    function gridColor() { return isDark() ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.1)'; }
+    function tickColor() { return isDark() ? '#aaa' : '#666'; }
+
     fetch("{{url_for('get_compare_songs')}}")
         .then((r) => r.json())
         .then(({ songs, users, matrix }) => {
@@ -34,21 +40,36 @@ Stats{% endblock %} {% block content %}
                 borderWidth: 1,
             }));
 
-            new Chart(document.getElementById("compareChart"), {
+            const chart = new Chart(document.getElementById("compareChart"), {
                 type: "bar",
                 data: { labels: songs, datasets },
                 options: {
                     responsive: true,
                     plugins: { legend: { position: "top" } },
                     scales: {
-                        x: { ticks: { maxRotation: 45, font: { size: 11 } } },
+                        x: {
+                            ticks: { maxRotation: 45, font: { size: 11 }, color: tickColor() },
+                            grid: { color: gridColor() },
+                        },
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: "{{_('Plays')}}" },
+                            title: { display: true, text: "{{_('Plays')}}", color: tickColor() },
+                            ticks: { color: tickColor() },
+                            grid: { color: gridColor() },
                         },
                     },
                 },
             });
+
+            // Re-color when theme toggles
+            new MutationObserver(() => {
+                chart.options.scales.x.ticks.color = tickColor();
+                chart.options.scales.x.grid.color = gridColor();
+                chart.options.scales.y.title.color = tickColor();
+                chart.options.scales.y.ticks.color = tickColor();
+                chart.options.scales.y.grid.color = gridColor();
+                chart.update();
+            }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
 
             // Comparison table
             const maxPerSong = songs.map((_, si) =>
